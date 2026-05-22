@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aero — Move at the Speed of Thought</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #08090A;
+    --surface: #111214;
+    --surface2: #18191C;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #F0EEE8;
+    --muted: #8A8880;
+    --accent: #C8F53E;
+    --accent2: #8BF0B0;
+    --accent3: #5CB8FF;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 4rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(8,9,10,0.7);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #0A0A0A;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.6rem 1.4rem;
+    border-radius: 100px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  .nav-cta:hover { transform: translateY(-1px); opacity: 0.92; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 6rem;
+    position: relative;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(ellipse at center, rgba(200,245,62,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(200,245,62,0.08);
+    border: 1px solid rgba(200,245,62,0.2);
+    border-radius: 100px;
+    padding: 0.35rem 1rem;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3.2rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(200,245,62,0.6);
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+    color: var(--muted);
+    max-width: 520px;
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 3rem;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0A0A0A;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.9rem 2.2rem;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 0 40px rgba(200,245,62,0.25);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 60px rgba(200,245,62,0.4);
+  }
+
+  .btn-ghost {
+    color: var(--muted);
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--text); }
+  .btn-ghost svg { transition: transform 0.2s; }
+  .btn-ghost:hover svg { transform: translateX(3px); }
+
+  .hero-visual {
+    margin-top: 5rem;
+    width: 100%;
+    max-width: 900px;
+    animation: fadeUp 0.8s ease 0.4s both;
+    position: relative;
+  }
+
+  .dashboard-frame {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+
+  .frame-bar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .frame-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .frame-dot:nth-child(1) { background: #FF5F57; }
+  .frame-dot:nth-child(2) { background: #FFBD2E; }
+  .frame-dot:nth-child(3) { background: #28C840; }
+
+  .frame-url {
+    margin-left: 1rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    padding: 0.3rem 1rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: monospace;
+  }
+
+  .dashboard-content {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 360px;
+  }
+
+  .dash-sidebar {
+    background: var(--surface2);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .dash-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .dash-nav-item.active {
+    background: rgba(200,245,62,0.1);
+    color: var(--accent);
+  }
+  .dash-nav-item:hover:not(.active) {
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+  }
+  .dash-icon { font-size: 15px; }
+
+  .dash-main {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .dash-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+
+  .metric-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+  }
+  .metric-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .metric-value { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--text); }
+  .metric-change { font-size: 0.72rem; color: var(--accent); margin-top: 0.2rem; }
+
+  .dash-chart-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .dash-chart {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 80px;
+    margin-top: 0.75rem;
+  }
+  .bar {
+    flex: 1;
+    background: rgba(200,245,62,0.15);
+    border-radius: 3px 3px 0 0;
+    border: 1px solid rgba(200,245,62,0.25);
+    position: relative;
+    transition: background 0.2s;
+  }
+  .bar.highlight { background: rgba(200,245,62,0.5); border-color: var(--accent); }
+  .bar:hover { background: rgba(200,245,62,0.35); }
+
+  .dash-list {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  .list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78rem;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item-name { color: var(--muted); }
+  .list-item-val { color: var(--accent2); font-weight: 500; }
+
+  /* ── LOGOS ── */
+  .logos {
+    text-align: center;
+    padding: 4rem 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .logos p { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 2rem; }
+  .logos-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3.5rem;
+    flex-wrap: wrap;
+  }
+  .logo-item {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.18);
+    letter-spacing: -0.02em;
+    transition: color 0.2s;
+  }
+  .logo-item:hover { color: rgba(255,255,255,0.5); }
+
+  /* ── FEATURES ── */
+  .section { padding: 7rem 4rem; }
+  .section-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.25rem;
+  }
+  .section-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 440px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,245,62,0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .feature-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-card.large { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+
+  .feature-icon {
+    width: 44px; height: 44px;
+    background: rgba(200,245,62,0.1);
+    border: 1px solid rgba(200,245,62,0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .feature-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.6rem;
+  }
+
+  .feature-card p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .feature-mini-visual {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .code-snippet {
+    font-family: monospace;
+    font-size: 0.72rem;
+    line-height: 1.8;
+    color: var(--muted);
+    text-align: left;
+    width: 100%;
+  }
+  .code-snippet .kw { color: var(--accent3); }
+  .code-snippet .fn { color: var(--accent); }
+  .code-snippet .str { color: var(--accent2); }
+  .code-snippet .cmt { color: rgba(138,136,128,0.5); }
+
+  /* ── STATS ── */
+  .stats-section {
+    padding: 5rem 4rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+  .stat-item {
+    background: var(--surface);
+    padding: 2.5rem 2rem;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .stat-desc { font-size: 0.85rem; color: var(--muted); }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials { padding: 7rem 4rem; }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 4rem;
+  }
+  .testimonial-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .stars { color: var(--accent); font-size: 0.85rem; letter-spacing: 2px; }
+  .testimonial-text { font-size: 0.92rem; color: var(--muted); line-height: 1.7; font-weight: 300; font-style: italic; }
+  .testimonial-author { display: flex; align-items: center; gap: 0.75rem; margin-top: auto; }
+  .author-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .author-name { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+  .author-role { font-size: 0.75rem; color: var(--muted); }
+
+  /* ── PRICING ── */
+  .pricing { padding: 7rem 4rem; text-align: center; }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 4rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .pricing-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: left;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .pricing-card:hover { transform: translateY(-4px); }
+  .pricing-card.featured {
+    border-color: rgba(200,245,62,0.35);
+    background: linear-gradient(160deg, rgba(200,245,62,0.05) 0%, var(--surface) 60%);
+  }
+  .pricing-badge {
+    position: absolute;
+    top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--accent);
+    color: #0A0A0A;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.85rem;
+    border-radius: 100px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .plan-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+  .plan-price { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; letter-spacing: -0.04em; color: var(--text); line-height: 1; }
+  .plan-price span { font-size: 1rem; color: var(--muted); font-family: 'DM Sans', sans-serif; font-weight: 300; }
+  .plan-desc { font-size: 0.85rem; color: var(--muted); margin: 0.75rem 0 1.5rem; line-height: 1.6; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.75rem; }
+  .plan-features li { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 0.5rem; }
+  .plan-features li::before { content: '✓'; color: var(--accent); font-size: 0.75rem; }
+  .plan-features li.off { opacity: 0.3; }
+  .plan-features li.off::before { content: '✕'; color: var(--muted); }
+
+  .btn-plan {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 100px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-plan:hover { background: rgba(255,255,255,0.06); }
+  .btn-plan.primary {
+    background: var(--accent);
+    color: #0A0A0A;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+  .btn-plan.primary:hover { opacity: 0.9; }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 8rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(200,245,62,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+  }
+  .cta-section p { font-size: 1.05rem; color: var(--muted); margin-bottom: 2.5rem; font-weight: 300; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  footer p { font-size: 0.82rem; color: var(--muted); }
+  .footer-links { display: flex; gap: 2rem; }
+  .footer-links a { font-size: 0.82rem; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--text); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SCROLL ANIMATION ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .section { padding: 5rem 1.5rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .feature-card.large { grid-column: span 1; grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .dashboard-content { grid-template-columns: 1fr; }
+    .dash-sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">aer<span>o</span></a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#">Docs</a></li>
+    <li><a href="#">Blog</a></li>
+  </ul>
+  <a href="#pricing" class="nav-cta">Get started →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge">
+    <span class="badge-dot"></span>
+    Now in public beta
+  </div>
+  <h1>Move at the<br/><em>speed of thought</em></h1>
+  <p>Aero is the all-in-one platform that helps teams ship faster, collaborate smarter, and scale without limits.</p>
+  <div class="hero-actions">
+    <a href="#pricing" class="btn-primary">Start for free</a>
+    <a href="#features" class="btn-ghost">
+      See how it works
+      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+
+  <div class="hero-visual">
+    <div class="dashboard-frame">
+      <div class="frame-bar">
+        <div class="frame-dot"></div>
+        <div class="frame-dot"></div>
+        <div class="frame-dot"></div>
+        <div class="frame-url">app.aero.io/dashboard</div>
+      </div>
+      <div class="dashboard-content">
+        <div class="dash-sidebar">
+          <div class="dash-nav-item active"><span class="dash-icon">⊞</span> Overview</div>
+          <div class="dash-nav-item"><span class="dash-icon">⬡</span> Projects</div>
+          <div class="dash-nav-item"><span class="dash-icon">⟳</span> Pipelines</div>
+          <div class="dash-nav-item"><span class="dash-icon">◈</span> Analytics</div>
+          <div class="dash-nav-item"><span class="dash-icon">◎</span> Settings</div>
+        </div>
+        <div class="dash-main">
+          <div class="dash-metrics">
+            <div class="metric-card">
+              <div class="metric-label">Total Deploys</div>
+              <div class="metric-value">1,284</div>
+              <div class="metric-change">↑ 12% this week</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Uptime</div>
+              <div class="metric-value">99.9%</div>
+              <div class="metric-change">↑ stable</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Active Users</div>
+              <div class="metric-value">8.4k</div>
+              <div class="metric-change">↑ 34% this month</div>
+            </div>
+          </div>
+          <div class="dash-chart-row">
+            <div class="dash-chart">
+              <div class="metric-label">Deploy frequency</div>
+              <div class="chart-bars">
+                <div class="bar" style="height:35%"></div>
+                <div class="bar" style="height:55%"></div>
+                <div class="bar" style="height:42%"></div>
+                <div class="bar" style="height:70%"></div>
+                <div class="bar" style="height:60%"></div>
+                <div class="bar highlight" style="height:88%"></div>
+                <div class="bar" style="height:75%"></div>
+                <div class="bar" style="height:65%"></div>
+                <div class="bar" style="height:80%"></div>
+                <div class="bar" style="height:92%"></div>
+                <div class="bar" style="height:78%"></div>
+                <div class="bar highlight" style="height:100%"></div>
+              </div>
+            </div>
+            <div class="dash-list">
+              <div class="metric-label">Recent activity</div>
+              <div class="list-item"><span class="list-item-name">api-gateway</span><span class="list-item-val">deployed</span></div>
+              <div class="list-item"><span class="list-item-name">auth-service</span><span class="list-item-val">scaled ×3</span></div>
+              <div class="list-item"><span class="list-item-name">frontend</span><span class="list-item-val">cdn synced</span></div>
+              <div class="list-item"><span class="list-item-name">db-replica</span><span class="list-item-val">online</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos">
+  <p>Trusted by teams at</p>
+  <div class="logos-row">
+    <div class="logo-item">Stripe</div>
+    <div class="logo-item">Vercel</div>
+    <div class="logo-item">Linear</div>
+    <div class="logo-item">Notion</div>
+    <div class="logo-item">Figma</div>
+    <div class="logo-item">Loom</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="reveal"><div class="section-label">Features</div></div>
+  <div class="reveal reveal-delay-1">
+    <h2 class="section-title">Everything your team<br/>needs to move fast</h2>
+  </div>
+  <div class="reveal reveal-delay-2">
+    <p class="section-sub">From instant deployments to real-time collaboration — Aero handles the infrastructure so you can focus on building.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon">⚡</div>
+      <h3>Instant Deployments</h3>
+      <p>Push to main and your app is live in seconds. Zero config, zero downtime. Automatic rollbacks if anything goes wrong.</p>
+    </div>
+    <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-icon">🔒</div>
+      <h3>Zero-Trust Security</h3>
+      <p>SOC2 Type II certified. End-to-end encryption, SSO, audit logs, and fine-grained access controls out of the box.</p>
+    </div>
+    <div class="feature-card large reveal">
+      <div>
+        <div class="feature-icon">⚙️</div>
+        <h3>Powerful Pipelines</h3>
+        <p>Define your CI/CD pipeline in code. Branch previews, parallel jobs, cache layers — everything runs in isolated containers on our global edge network.</p>
+        <br/>
+        <p style="font-size: 0.83rem; color: var(--muted);">Supports GitHub, GitLab, Bitbucket, and any Git provider.</p>
+      </div>
+      <div class="feature-mini-visual">
+        <div class="code-snippet">
+<span class="cmt"># .aero/pipeline.yml</span>
+<span class="kw">pipeline</span>:
+  <span class="kw">stages</span>:
+    - <span class="fn">test</span>:
+        <span class="kw">run</span>: <span class="str">"npm test"</span>
+        <span class="kw">cache</span>: node_modules
+    - <span class="fn">build</span>:
+        <span class="kw">run</span>: <span class="str">"npm run build"</span>
+        <span class="kw">artifact</span>: dist/
+    - <span class="fn">deploy</span>:
+        <span class="kw">target</span>: <span class="str">production</span>
+        <span class="kw">strategy</span>: <span class="str">blue-green</span>
+        </div>
+      </div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-icon">📊</div>
+      <h3>Real-Time Analytics</h3>
+      <p>Monitor every request, latency spike, and error in real time. Custom dashboards that update every second.</p>
+    </div>
+    <div class="feature-card reveal reveal-delay-1">
+      <div class="feature-icon">🌍</div>
+      <h3>Global Edge Network</h3>
+      <p>Deploy to 38+ regions with a single command. Automatic traffic routing to the nearest data center for &lt;10ms latency.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <span class="stat-num">38+</span>
+      <div class="stat-desc">Edge regions worldwide</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-1">
+      <span class="stat-num">99.9%</span>
+      <div class="stat-desc">Uptime SLA guaranteed</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-2">
+      <span class="stat-num">12k+</span>
+      <div class="stat-desc">Teams shipping daily</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-3">
+      <span class="stat-num">4.2s</span>
+      <div class="stat-desc">Average deploy time</div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="reveal"><div class="section-label">Testimonials</div></div>
+  <div class="reveal reveal-delay-1"><h2 class="section-title">Loved by builders</h2></div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card reveal">
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"We cut our deployment time by 80% in the first week. Aero just works — no fiddling, no YAML hell."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">JK</div>
+        <div>
+          <div class="author-name">James Kim</div>
+          <div class="author-role">CTO, Relay</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-1">
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"The branch previews alone are worth it. Every PR gets its own live URL — reviewing changes has never been easier."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">SA</div>
+        <div>
+          <div class="author-name">Sara Alvarez</div>
+          <div class="author-role">Lead Engineer, Cascade</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card reveal reveal-delay-2">
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"Finally an infra platform that doesn't require a dedicated DevOps team. Our 3-person startup runs like a 50-person company."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">TP</div>
+        <div>
+          <div class="author-name">Tom Park</div>
+          <div class="author-role">Founder, Glint</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="reveal"><div class="section-label">Pricing</div></div>
+  <div class="reveal reveal-delay-1"><h2 class="section-title">Simple, honest pricing</h2></div>
+  <div class="reveal reveal-delay-2"><p class="section-sub" style="margin: 0 auto 0;">No hidden fees. No surprises. Start free and scale as you grow.</p></div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card reveal">
+      <div class="plan-name">Hobby</div>
+      <div class="plan-price">$0<span> / month</span></div>
+      <div class="plan-desc">Perfect for side projects and experiments.</div>
+      <ul class="plan-features">
+        <li>3 projects</li>
+        <li>100 deploys / month</li>
+        <li>1 team member</li>
+        <li>Community support</li>
+        <li class="off">Custom domains</li>
+        <li class="off">Analytics</li>
+      </ul>
+      <button class="btn-plan">Get started free</button>
+    </div>
+    <div class="pricing-card featured reveal reveal-delay-1">
+      <div class="pricing-badge">Most popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">$29<span> / month</span></div>
+      <div class="plan-desc">For growing teams that need more power.</div>
+      <ul class="plan-features">
+        <li>Unlimited projects</li>
+        <li>Unlimited deploys</li>
+        <li>Up to 10 members</li>
+        <li>Priority support</li>
+        <li>Custom domains</li>
+        <li>Advanced analytics</li>
+      </ul>
+      <button class="btn-plan primary">Start free trial</button>
+    </div>
+    <div class="pricing-card reveal reveal-delay-2">
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-price">Custom</div>
+      <div class="plan-desc">For large teams with custom needs and SLAs.</div>
+      <ul class="plan-features">
+        <li>Everything in Pro</li>
+        <li>SSO / SAML</li>
+        <li>Dedicated support</li>
+        <li>99.99% SLA</li>
+        <li>Custom contracts</li>
+        <li>Audit logs</li>
+      </ul>
+      <button class="btn-plan">Contact sales</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="reveal">Ready to ship<br/>at <em style="font-style:normal; color: var(--accent);">warp speed?</em></h2>
+  <p class="reveal reveal-delay-1">Join 12,000+ teams already building with Aero.</p>
+  <div class="reveal reveal-delay-2">
+    <a href="#" class="btn-primary" style="font-size: 1.05rem; padding: 1rem 2.5rem;">Get started — it's free</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 Aero, Inc. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Status</a>
+    <a href="#">Twitter</a>
+    <a href="#">GitHub</a>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
